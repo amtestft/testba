@@ -51,7 +51,7 @@ except json.JSONDecodeError as e:
     raise ValueError(f"❌ JSON decoding error: {e}")
 
 # Authenticate using the credentials
-#credentials = service_account.Credentials.from_service_account_info(credentials_info)
+credentials = service_account.Credentials.from_service_account_info(credentials_info)
 
 # Function to fetch GA4 data
 def get_ga4_data():
