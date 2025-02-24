@@ -29,7 +29,8 @@ app = FastAPI()
 
 # Retrieve JSON credentials from environment variable
 ga4_json_credentials = os.getenv("GA4_CREDENTIALS_JSON")
-property_id = os.getenv("PROPERTY_ID")
+# property_id = os.getenv("PROPERTY_ID")
+property_id = "477023147"
 
 # Ensure environment variables are set
 if not ga4_json_credentials:
