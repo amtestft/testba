@@ -28,25 +28,32 @@ import json
 app = FastAPI()
 
 # Retrieve JSON credentials from environment variable
-ga4_json_credentials = os.getenv("GA4_CREDENTIALS_JSON")
+# ga4_json_credentials = os.getenv("GA4_CREDENTIALS_JSON")
 # property_id = os.getenv("PROPERTY_ID")
 property_id = "477023147"
 
 # Ensure environment variables are set
-if not ga4_json_credentials:
+'''if not ga4_json_credentials:
     raise ValueError("GA4_CREDENTIALS_JSON environment variable is missing!")
 if not property_id:
     raise ValueError("PROPERTY_ID environment variable is missing!")
+'''
+
+credentials_path = "/etc/secrets/ga4_credentials.json"
+
+if not os.path.exists(credentials_path):
+    raise ValueError("GA4 credentials file is missing!")
 
 # Load credentials from JSON
 try:
-    credentials_info = json.loads(ga4_json_credentials)
+    #credentials_info = json.loads(ga4_json_credentials)
+    credentials = service_account.Credentials.from_service_account_file(credentials_path)
     print("✅ Successfully loaded JSON credentials!")
 except json.JSONDecodeError as e:
     raise ValueError(f"❌ JSON decoding error: {e}")
 
 # Authenticate using the credentials
-credentials = service_account.Credentials.from_service_account_info(credentials_info)
+#credentials = service_account.Credentials.from_service_account_info(credentials_info)
 
 # Function to fetch GA4 data
 def get_ga4_data():
