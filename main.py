@@ -41,6 +41,19 @@ if not property_id:
 
 credentials_path = "/etc/secrets/ga4_credentials.json"
 
+# Load and read the JSON file
+try:
+    with open(credentials_path, "r") as file:
+        credentials_data = json.load(file)  # Load as JSON object
+
+    # Print first 100 lines (limiting output for readability)
+    credentials_str = json.dumps(credentials_data, indent=2)
+    lines = credentials_str.split("\n")  # Split by line
+    for i, line in enumerate(lines[:100]):  # Limit to first 100 rows
+        print(line)
+except Exception as e:
+    print(f"Error loading JSON: {e}")
+
 if not os.path.exists(credentials_path):
     raise ValueError("GA4 credentials file is missing!")
 
