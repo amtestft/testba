@@ -13,8 +13,10 @@ import json
 app = FastAPI()
 
 # Retrieve JSON credentials from environment variable
-ga4_json_credentials = os.getenv("GA4_CREDENTIALS_JSON")
-property_id = os.getenv("PROPERTY_ID")
+#ga4_json_credentials = os.getenv("GA4_CREDENTIALS_JSON")
+#property_id = os.getenv("PROPERTY_ID")
+ga4_json_credentials = os.getenv("GA4_BA")
+property_id = os.getenv("PROPERTY_ID_BA")
 print(property_id)
 
 # Ensure environment variables are set
@@ -34,26 +36,6 @@ except json.JSONDecodeError as e:
 # Authenticate using the credentials
 credentials = service_account.Credentials.from_service_account_info(credentials_info)
 
-# Function to fetch GA4 data
-# https://cloud.google.com/php/docs/reference/analytics-data/0.20.1/V1beta.DateRange
-'''def get_ga4_data():
-    """Retrieve data from GA4 API"""
-    client = BetaAnalyticsDataClient(credentials=credentials)
-    request = RunReportRequest(
-        property=f"properties/{property_id}",
-        dimensions=[Dimension(name="city")],
-        metrics=[Metric(name="sessions")],
-        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
-    )
-    response = client.run_report(request)
-    
-    data = [
-        {"city": row.dimension_values[0].value, "sessions": int(row.metric_values[0].value)}
-        for row in response.rows
-    ]
-    return data'''
-from google.analytics.data_v1beta import BetaAnalyticsDataClient, RunReportRequest, Dimension, Metric, DateRange
-
 def get_ga4_data():
     """Retrieve data from GA4 API with additional metrics and dimensions"""
     client = BetaAnalyticsDataClient(credentials=credentials)
@@ -62,16 +44,13 @@ def get_ga4_data():
         property=f"properties/{property_id}",
         dimensions=[
             Dimension(name="city"),
-            Dimension(name="country"),
-            Dimension(name="deviceCategory"),
-            Dimension(name="date")  # Adding time granularity
+            Dimension(name="sessionDefaultChannelGroup"),
+            Dimension(name="date")
         ],
         metrics=[
-            Metric(name="sessions"),
-            Metric(name="activeUsers"),
-            Metric(name="bounceRate")
+            Metric(name="sessions")
         ],
-        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
+        date_ranges=[DateRange(start_date="2024-12-01", end_date="today")],
     )
     
     response = client.run_report(request)
@@ -79,12 +58,9 @@ def get_ga4_data():
     data = [
         {
             "city": row.dimension_values[0].value,
-            "country": row.dimension_values[1].value,
-            "deviceCategory": row.dimension_values[2].value,
-            "date": row.dimension_values[3].value,
-            "sessions": int(row.metric_values[0].value),
-            "activeUsers": int(row.metric_values[1].value),
-            "bounceRate": float(row.metric_values[2].value)
+            "sessionDefaultChannelGroup": row.dimension_values[1].value,
+            "date": row.dimension_values[2].value,
+            "sessions": int(row.metric_values[0].value)
         }
         for row in response.rows
     ]
