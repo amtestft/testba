@@ -1,18 +1,3 @@
-'''from typing import Optional
-
-from fastapi import FastAPI
-
-app = FastAPI()
-
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Optional[str] = None):
-    return {"item_id": item_id, "q": q}
-    '''
 from fastapi import FastAPI, HTTPException
 from google.analytics.data_v1beta import BetaAnalyticsDataClient
 from google.analytics.data_v1beta.types import (
@@ -29,8 +14,8 @@ app = FastAPI()
 
 # Retrieve JSON credentials from environment variable
 # ga4_json_credentials = os.getenv("GA4_CREDENTIALS_JSON")
-# property_id = os.getenv("PROPERTY_ID")
-property_id = "477023147"
+property_id = os.getenv("PROPERTY_ID")
+print(property_id)
 
 # Ensure environment variables are set
 '''if not ga4_json_credentials:
