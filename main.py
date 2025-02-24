@@ -23,25 +23,6 @@ if not ga4_json_credentials:
 if not property_id:
     raise ValueError("PROPERTY_ID environment variable is missing!")
 
-#credentials_path = "/etc/secrets/ga4_credentials.json"
-
-# Load and read the JSON file
-'''try:
-    with open(credentials_path, "r") as file:
-        credentials_data = json.load(file)  # Load as JSON object
-
-    # Print first 100 lines (limiting output for readability)
-    credentials_str = json.dumps(credentials_data, indent=2)
-    lines = credentials_str.split("\n")  # Split by line
-    for i, line in enumerate(lines[:100]):  # Limit to first 100 rows
-        print(line)
-except Exception as e:
-    print(f"Error loading JSON: {e}")
-    
-    if not os.path.exists(credentials_path):
-    raise ValueError("GA4 credentials file is missing!")
-    '''
-
 # Load credentials from JSON
 try:
     credentials_info = json.loads(ga4_json_credentials)
@@ -54,14 +35,15 @@ except json.JSONDecodeError as e:
 credentials = service_account.Credentials.from_service_account_info(credentials_info)
 
 # Function to fetch GA4 data
-def get_ga4_data():
+# https://cloud.google.com/php/docs/reference/analytics-data/0.20.1/V1beta.DateRange
+'''def get_ga4_data():
     """Retrieve data from GA4 API"""
     client = BetaAnalyticsDataClient(credentials=credentials)
     request = RunReportRequest(
         property=f"properties/{property_id}",
         dimensions=[Dimension(name="city")],
         metrics=[Metric(name="sessions")],
-        date_ranges=[DateRange(start_date="7daysAgo", end_date="today")],
+        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
     )
     response = client.run_report(request)
     
@@ -69,7 +51,49 @@ def get_ga4_data():
         {"city": row.dimension_values[0].value, "sessions": int(row.metric_values[0].value)}
         for row in response.rows
     ]
+    return data'''
+from google.analytics.data_v1beta import BetaAnalyticsDataClient, RunReportRequest, Dimension, Metric, DateRange
+
+def get_ga4_data():
+    """Retrieve data from GA4 API with additional metrics and dimensions"""
+    client = BetaAnalyticsDataClient(credentials=credentials)
+    
+    request = RunReportRequest(
+        property=f"properties/{property_id}",
+        dimensions=[
+            Dimension(name="city"),
+            Dimension(name="country"),
+            Dimension(name="deviceCategory"),
+            Dimension(name="date")  # Adding time granularity
+        ],
+        metrics=[
+            Metric(name="sessions"),
+            Metric(name="activeUsers"),
+            Metric(name="bounceRate")
+        ],
+        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
+    )
+    
+    response = client.run_report(request)
+    
+    data = [
+        {
+            "city": row.dimension_values[0].value,
+            "country": row.dimension_values[1].value,
+            "deviceCategory": row.dimension_values[2].value,
+            "date": row.dimension_values[3].value,
+            "sessions": int(row.metric_values[0].value),
+            "activeUsers": int(row.metric_values[1].value),
+            "bounceRate": float(row.metric_values[2].value)
+        }
+        for row in response.rows
+    ]
+    
     return data
+
+@app.get("/")
+def home():
+    return {"message": "Welcome to the GA4 Data API"}
 
 @app.get("/get_ga4_data")
 def get_data():
