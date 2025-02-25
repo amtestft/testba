@@ -9,6 +9,7 @@ from google.analytics.data_v1beta.types import (
 from google.oauth2 import service_account
 import os
 import json
+import datetime
 
 app = FastAPI()
 
@@ -59,7 +60,7 @@ def get_ga4_data():
         {
             "city": row.dimension_values[0].value,
             "sessionDefaultChannelGroup": row.dimension_values[1].value,
-            "date": row.dimension_values[2].value,
+            "date": datetime.strptime(row.dimension_values[2].value, "%Y%m%d").strftime("%Y-%m-%d"),
             "sessions": int(row.metric_values[0].value)
         }
         for row in response.rows
