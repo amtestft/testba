@@ -51,7 +51,7 @@ def get_ga4_data():
         metrics=[
             Metric(name="sessions")
         ],
-        date_ranges=[DateRange(start_date="2024-01-01", end_date="2025-02-22")],
+        date_ranges=[DateRange(start_date="2023-01-01", end_date="today")],
     )
     
     response = client.run_report(request)
