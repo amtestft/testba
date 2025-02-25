@@ -9,7 +9,7 @@ from google.analytics.data_v1beta.types import (
 from google.oauth2 import service_account
 import os
 import json
-import datetime
+from datetime import datetime
 
 app = FastAPI()
 
